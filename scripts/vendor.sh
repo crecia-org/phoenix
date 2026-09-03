@@ -58,11 +58,13 @@ echo "--> psqldef compilado desde $built_ref"
 gzip -9 -c "$work/psqldef" > "$out/psqldef.gz"
 
 # ── squawk, release oficial ─────────────────────────────────────────────────
+# Los nombres de asset de squawk usan x64/arm64, NO x86_64/aarch64 (que es lo
+# que devuelve uname). No se derivan de $arch: hay que mirar el release.
 case "$platform" in
-  linux-amd64)  squawk_asset="squawk-linux-x86_64" ;;
-  linux-arm64)  squawk_asset="squawk-linux-aarch64" ;;
-  darwin-amd64) squawk_asset="squawk-darwin-x86_64" ;;
-  darwin-arm64) squawk_asset="squawk-darwin-aarch64" ;;
+  linux-amd64)  squawk_asset="squawk-linux-x64" ;;
+  linux-arm64)  squawk_asset="squawk-linux-arm64" ;;
+  darwin-amd64) squawk_asset="squawk-darwin-x64" ;;
+  darwin-arm64) squawk_asset="squawk-darwin-arm64" ;;
   *) echo "no sé qué asset de squawk corresponde a $platform" >&2; exit 1 ;;
 esac
 
