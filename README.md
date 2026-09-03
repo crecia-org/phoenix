@@ -1,6 +1,6 @@
-# crecia-phoenix
+# phoenix
 
-`phoenix` — CLI de migraciones y schema para las bases de Crecia. Se distribuye como **un
+CLI de migraciones y schema para las bases de Crecia. Se distribuye como **un
 solo ejecutable con psqldef y squawk adentro**: no hay que instalar nada más en
 la máquina que lo usa.
 
