@@ -1,4 +1,5 @@
 import { loadConfig } from "./config.ts";
+import { baselineCommand } from "./commands/baseline.ts";
 import { diffCommand } from "./commands/diff.ts";
 import { exportCommand } from "./commands/export.ts";
 import { initCommand } from "./commands/init.ts";
@@ -25,6 +26,7 @@ ${bold("COMANDOS")}
   diff                SQL que llevaría la base a lo que dice el schema
   export              regenera el schema desde la base viva
   lint                pasa las migraciones por squawk
+  baseline            genera el snapshot inicial (UNA sola vez por repo)
   init                crea un crecia-db.config.ts en el directorio actual
   versions            qué versiones lleva este ejecutable adentro
 
@@ -102,6 +104,8 @@ export async function main(argv: string[]): Promise<number> {
       return exportCommand(config);
     case "lint":
       return lintCommand(config);
+    case "baseline":
+      return baselineCommand(config, args);
     default:
       fail(`comando desconocido: ${command}`);
       info(`  Probá: crecia-db --help`);

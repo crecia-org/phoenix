@@ -26,9 +26,15 @@ export interface CreciaDbConfig {
    */
   baselineName?: string;
   /**
-   * Filtro opcional sobre el SQL que sale de `export`, antes de escribir el
-   * schema. Sirve para reordenarlo, que es lo que necesita un repo cuyo
-   * baseline se ejecuta de arriba a abajo contra una base vacía.
+   * Reordenar el export para que sea ejecutable de arriba a abajo contra una
+   * base vacía (ver schema/reorder.ts). Prendido por default: el baseline es
+   * exactamente ese caso, y sin esto queda inservible de una forma que no se
+   * nota hasta que alguien intenta levantar una base desde cero.
+   */
+  reorderExport?: boolean;
+  /**
+   * Filtro propio del repo sobre el SQL que sale de `export`, aplicado
+   * DESPUÉS del reordenamiento.
    */
   transformExport?: (sql: string) => string | Promise<string>;
 }
@@ -93,6 +99,7 @@ export async function loadConfig(options: { cwd?: string; configPath?: string } 
     psqldefConfig: raw.psqldefConfig != null ? fromRoot(raw.psqldefConfig) : "",
     lintExclude: raw.lintExclude ?? ["*_baseline_schema.sql"],
     baselineName: raw.baselineName ?? "baseline_schema",
+    reorderExport: raw.reorderExport ?? true,
     transformExport: raw.transformExport,
   };
 }

@@ -49,6 +49,7 @@ export default {
 | `crecia-db diff --check` | sale 1 si hay cualquier diferencia (CI) |
 | `crecia-db export` | regenera el schema desde la base viva |
 | `crecia-db lint` | pasa las migraciones por squawk |
+| `crecia-db baseline` | genera el snapshot inicial (UNA vez por repo) |
 | `crecia-db versions` | qué versiones lleva este ejecutable adentro |
 
 `DATABASE_URL` es obligatoria para todo lo que toca la base.
@@ -123,3 +124,18 @@ squawk juntos. Está reimplementado en `src/migrations/`.
 **psql.** Se usa `Bun.SQL`, el cliente de Postgres del runtime. Depender de que
 libpq esté instalado en la máquina destino contradice el punto de distribuir un
 ejecutable: `psql` "siempre está" hasta que no está.
+
+## El reordenamiento del export
+
+`export` reordena lo que devuelve psqldef antes de escribirlo: extensiones y
+tipos, después las tablas, después TODAS las FK, después las funciones y al
+final los triggers. psqldef agrupa por tabla en orden alfabético, así que una
+FK puede apuntar a algo definido más abajo. Da igual para el diff, que compara
+por identidad de objeto; es fatal para el baseline, que es exactamente un
+archivo que se ejecuta de principio a fin contra una base vacía.
+
+`CREATE CONSTRAINT TRIGGER` cuenta como trigger acá. Parece obvio y no lo es:
+no empieza con `CREATE TRIGGER`, así que un clasificador que compare ese
+prefijo lo manda al grupo de las tablas, antes de la función que ejecuta. El
+archivo resultante falla al primer constraint trigger contra una base vacía —
+y solo se nota el día que alguien levanta una base desde cero.
