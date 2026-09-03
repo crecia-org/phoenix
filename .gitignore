@@ -1,0 +1,6 @@
+node_modules/
+dist/
+# Los binarios vendorizados los produce scripts/vendor.sh — no se commitean:
+# pesan ~14MB comprimidos y se reconstruyen desde una versión fija (ver
+# vendor.lock.json). El build de release los necesita presentes.
+src/vendor/bin/

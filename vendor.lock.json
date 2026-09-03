@@ -1,0 +1,6 @@
+{
+  "sqldefRepo": "https://github.com/ceftx/sqldef.git",
+  "sqldefRef": "support-constraint-triggers",
+  "sqldefNote": "Fork con soporte de CREATE CONSTRAINT TRIGGER. El upstream (>= v3.11.20) no lo parsea y hace fallar el diff de la base ENTERA en cuanto existe uno. PR pendiente contra sqldef/sqldef; cuando mergee, esto vuelve a apuntar al upstream con un tag.",
+  "squawkVersion": "v2.63.0"
+}
