@@ -12,7 +12,7 @@ import { statusCommand } from "./commands/status.ts";
 import { versionsCommand } from "./commands/versions.ts";
 import { bold, dim, fail, info } from "./ui.ts";
 
-export const CLI_VERSION = "0.1.0";
+export const CLI_VERSION = "0.2.0";
 
 const HELP = `${bold("phoenix")} ${dim(CLI_VERSION)} — migraciones y schema, con psqldef y squawk adentro
 

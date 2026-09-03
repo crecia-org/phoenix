@@ -1,6 +1,6 @@
 {
   "name": "phoenix",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "CLI de migraciones y schema para las bases de Crecia. Se distribuye como un ejecutable con psqldef y squawk adentro.",
