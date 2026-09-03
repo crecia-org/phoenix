@@ -6,6 +6,7 @@ import { initCommand } from "./commands/init.ts";
 import { lintCommand } from "./commands/lint.ts";
 import { migrateCommand } from "./commands/migrate.ts";
 import { newCommand } from "./commands/new.ts";
+import { pendingCommand } from "./commands/pending.ts";
 import { rollbackCommand } from "./commands/rollback.ts";
 import { statusCommand } from "./commands/status.ts";
 import { versionsCommand } from "./commands/versions.ts";
@@ -24,6 +25,7 @@ ${bold("COMANDOS")}
   rollback            revierte la última migración aplicada
   new <nombre>        crea un archivo de migración vacío
   diff                SQL que llevaría la base a lo que dice el schema
+  pending             clasifica y evalúa el riesgo de lo que falta aplicar
   export              regenera el schema desde la base viva
   lint                pasa las migraciones por squawk
   baseline            genera el snapshot inicial (UNA sola vez por repo)
@@ -38,6 +40,18 @@ ${bold("OPCIONES DE migrate")}
 
 ${bold("OPCIONES DE diff")}
   --check             sale 1 si hay cualquier diferencia (para CI)
+  --review            reporte clasificado por riesgo y agrupado por tabla,
+                       con impacto real sobre los datos si hay DATABASE_URL
+                       (en vez del SQL crudo)
+
+${bold("OPCIONES DE diff --review Y DE pending")}
+  --only-risky        oculta el bucket seguro/aditivo — para diffs grandes
+  --html=<path>       además escribe un reporte HTML autocontenido
+  --md=<path>         además escribe un reporte en Markdown (GitHub-flavored)
+  --fail-on-impact    gate de CI: sale 1 solo si un CHECK/UNIQUE/SET NOT NULL
+                       nuevo rechazaría filas reales (necesita DATABASE_URL) —
+                       más fino que \`diff --check\`, que falla ante CUALQUIER
+                       diferencia
 
 ${bold("GLOBALES")}
   --config <path>     usa ese config en vez de buscar phoenix.config.ts
@@ -45,8 +59,9 @@ ${bold("GLOBALES")}
   -v, --version       la versión del CLI
 
 ${bold("ENTORNO")}
-  DATABASE_URL        obligatoria para todo lo que toca la base
-  PHOENIX_BIN_DIR   dónde buscar psqldef/squawk si el build no los trae
+  DATABASE_URL        obligatoria para todo lo que toca la base; también
+                      habilita el cálculo de impacto en \`diff --review\`/\`pending\`
+  PHOENIX_BIN_DIR     dónde buscar psqldef/squawk si el build no los trae
 `;
 
 /** Comandos que no necesitan config ni base. */
@@ -100,6 +115,8 @@ export async function main(argv: string[]): Promise<number> {
       return newCommand(config, args);
     case "diff":
       return diffCommand(config, args);
+    case "pending":
+      return pendingCommand(config, args);
     case "export":
       return exportCommand(config);
     case "lint":
