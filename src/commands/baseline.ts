@@ -41,14 +41,14 @@ export async function baselineCommand(config: ResolvedConfig, args: string[]): P
 -- partida para tener historial real desde acá en adelante.
 --
 -- El contenido de migrate:up es un volcado literal del schema al momento de
--- generar este archivo (crecia-db baseline).
+-- generar este archivo (phoenix baseline).
 --
--- No hace falta marcarlo a mano en ningún lado: "crecia-db migrate" distingue
+-- No hace falta marcarlo a mano en ningún lado: "phoenix migrate" distingue
 -- solo entre una base vacía (lo ejecuta) y una que ya tiene este schema (lo
 -- registra sin ejecutarlo, después de verificar que de verdad coincidan).
 --
 -- De acá en adelante, todo cambio de schema es una migración nueva
--- (crecia-db new <nombre>) generada desde crecia-db diff — no se edita este
+-- (phoenix new <nombre>) generada desde phoenix diff — no se edita este
 -- archivo, y no se genera otro baseline.
 
 -- migrate:up
@@ -65,6 +65,6 @@ END $$;
   await Bun.write(path, content);
 
   ok(`baseline generado: ${path}`);
-  info("  Commitealo, y en cada ambiente corré: crecia-db migrate");
+  info("  Commitealo, y en cada ambiente corré: phoenix migrate");
   return 0;
 }

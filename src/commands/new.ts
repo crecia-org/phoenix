@@ -35,7 +35,7 @@ const TEMPLATE = `-- migrate:up
 export async function newCommand(config: ResolvedConfig, args: string[]): Promise<number> {
   const name = args.find((a) => !a.startsWith("-"));
   if (name == null) {
-    fail("falta el nombre: crecia-db new <nombre>");
+    fail("falta el nombre: phoenix new <nombre>");
     return 1;
   }
 

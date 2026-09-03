@@ -1,6 +1,6 @@
-# crecia-db
+# crecia-phoenix
 
-CLI de migraciones y schema para las bases de Crecia. Se distribuye como **un
+`phoenix` — CLI de migraciones y schema para las bases de Crecia. Se distribuye como **un
 solo ejecutable con psqldef y squawk adentro**: no hay que instalar nada más en
 la máquina que lo usa.
 
@@ -21,14 +21,14 @@ Acá el fork viaja adentro del ejecutable. No hay comando obvio que lo rompa.
 Bajá el ejecutable de tu plataforma desde los releases y ponelo en el PATH:
 
 ```bash
-curl -sSfL <url-del-release>/crecia-db-linux-amd64 -o ~/.local/bin/crecia-db
-chmod +x ~/.local/bin/crecia-db
-crecia-db versions   # confirma qué lleva adentro
+curl -sSfL <url-del-release>/phoenix-linux-amd64 -o ~/.local/bin/phoenix
+chmod +x ~/.local/bin/phoenix
+phoenix versions   # confirma qué lleva adentro
 ```
 
 ## Usar
 
-En la raíz del repo, un `crecia-db.config.ts` (lo scaffoldea `crecia-db init`):
+En la raíz del repo, un `phoenix.config.ts` (lo scaffoldea `phoenix init`):
 
 ```ts
 export default {
@@ -41,16 +41,16 @@ export default {
 
 | Comando | Qué hace |
 |---|---|
-| `crecia-db status` | qué está aplicado y qué no |
-| `crecia-db migrate` | aplica lo pendiente y re-exporta el schema |
-| `crecia-db rollback` | revierte la última aplicada |
-| `crecia-db new <nombre>` | crea un archivo de migración vacío |
-| `crecia-db diff` | SQL que llevaría la base a lo que dice el schema |
-| `crecia-db diff --check` | sale 1 si hay cualquier diferencia (CI) |
-| `crecia-db export` | regenera el schema desde la base viva |
-| `crecia-db lint` | pasa las migraciones por squawk |
-| `crecia-db baseline` | genera el snapshot inicial (UNA vez por repo) |
-| `crecia-db versions` | qué versiones lleva este ejecutable adentro |
+| `phoenix status` | qué está aplicado y qué no |
+| `phoenix migrate` | aplica lo pendiente y re-exporta el schema |
+| `phoenix rollback` | revierte la última aplicada |
+| `phoenix new <nombre>` | crea un archivo de migración vacío |
+| `phoenix diff` | SQL que llevaría la base a lo que dice el schema |
+| `phoenix diff --check` | sale 1 si hay cualquier diferencia (CI) |
+| `phoenix export` | regenera el schema desde la base viva |
+| `phoenix lint` | pasa las migraciones por squawk |
+| `phoenix baseline` | genera el snapshot inicial (UNA vez por repo) |
+| `phoenix versions` | qué versiones lleva este ejecutable adentro |
 
 `DATABASE_URL` es obligatoria para todo lo que toca la base.
 
@@ -104,9 +104,14 @@ bun run typecheck
 Para un ejecutable de release:
 
 ```bash
-./scripts/vendor.sh linux-amd64   # compila psqldef del fork + baja squawk
-./scripts/build.sh linux-amd64    # los mete adentro del ejecutable
+bun run vendor linux-amd64   # compila psqldef del fork + baja squawk
+bun run build linux-amd64    # los mete adentro del ejecutable
 ```
+
+Los dos scripts son TypeScript con [Bun Shell](https://bun.sh/docs/runtime/shell),
+no bash. Solo `git` y `go` salen a la shell: comprimir y descargar los hace el
+runtime (`Bun.gzipSync`, `fetch`), así que **`gzip` y `curl` no son requisitos**
+— que es exactamente el problema que este repo existe para no tener.
 
 **Un ejecutable por plataforma, y no hay forma de evitarlo.** `bun build
 --compile` cross-compila el runtime de Bun, pero los binarios embebidos son

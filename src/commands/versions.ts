@@ -11,7 +11,7 @@ import { dim, info } from "../ui.ts";
  * la devuelve, y sirve para que CI falle si no coincide con lo esperado.
  */
 export async function versionsCommand(cliVersion: string): Promise<number> {
-  info(`crecia-db ${cliVersion}`);
+  info(`phoenix ${cliVersion}`);
   info(`bun       ${Bun.version}`);
 
   const source = (name: "psqldef" | "squawk"): string =>

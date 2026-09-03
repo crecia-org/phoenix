@@ -12,7 +12,7 @@ import { join } from "node:path";
  * de NO correr `go install ...@latest` encima (ver el README).
  *
  * Corriendo desde el fuente (`bun run src/cli.ts`) no hay nada embebido y se
- * usan los del PATH, o los de CRECIA_DB_BIN_DIR si está seteada.
+ * usan los del PATH, o los de PHOENIX_BIN_DIR si está seteada.
  */
 export type BinaryName = "psqldef" | "squawk";
 
@@ -34,7 +34,7 @@ export function hasEmbedded(name: BinaryName): boolean {
  */
 function cacheDir(): string {
   const base = process.env.XDG_CACHE_HOME ?? join(homedir(), ".cache");
-  return join(base, "crecia-db", "bin");
+  return join(base, "phoenix", "bin");
 }
 
 async function unpack(name: BinaryName, gzPath: string): Promise<string> {
@@ -61,7 +61,7 @@ export async function resolveBinary(name: BinaryName): Promise<string> {
   const gzPath = embedded[name];
   if (gzPath != null) return unpack(name, gzPath);
 
-  const overrideDir = process.env.CRECIA_DB_BIN_DIR;
+  const overrideDir = process.env.PHOENIX_BIN_DIR;
   if (overrideDir != null) {
     const candidate = join(overrideDir, name);
     if (existsSync(candidate)) return candidate;
@@ -73,7 +73,7 @@ export async function resolveBinary(name: BinaryName): Promise<string> {
   throw new Error(
     `${name} no está disponible.\n` +
       `  Este build del CLI no lo trae embebido (se está corriendo desde el fuente).\n` +
-      `  Instalalo en el PATH, apuntá CRECIA_DB_BIN_DIR a donde esté, o usá un\n` +
+      `  Instalalo en el PATH, apuntá PHOENIX_BIN_DIR a donde esté, o usá un\n` +
       `  ejecutable de release (pnpm build) que ya lo lleva adentro.`,
   );
 }

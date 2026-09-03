@@ -115,9 +115,9 @@ async function resolveBaseline(
       info(indent(differences.join("\n")));
       info("");
       info("Opciones:");
-      info("  - Si la base está bien y el que quedó viejo es el schema:  crecia-db export");
-      info("  - Si al schema le falta algo que la base ya tiene:         crecia-db new <nombre>");
-      info("  - Si sabés lo que hacés y querés registrarlo igual:        crecia-db migrate --adopt --force");
+      info("  - Si la base está bien y el que quedó viejo es el schema:  phoenix export");
+      info("  - Si al schema le falta algo que la base ya tiene:         phoenix new <nombre>");
+      info("  - Si sabés lo que hacés y querés registrarlo igual:        phoenix migrate --adopt --force");
       info("");
       return 1;
     }

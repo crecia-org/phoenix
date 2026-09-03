@@ -1,13 +1,13 @@
 {
-  "name": "crecia-db",
+  "name": "crecia-phoenix",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "description": "CLI de migraciones y schema para las bases de Crecia. Se distribuye como un ejecutable con psqldef y squawk adentro.",
   "scripts": {
     "dev": "bun run src/cli.ts",
-    "vendor": "./scripts/vendor.sh",
-    "build": "./scripts/build.sh",
+    "vendor": "bun run scripts/vendor.ts",
+    "build": "bun run scripts/build.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

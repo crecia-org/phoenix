@@ -13,10 +13,10 @@ import { bold, dim, fail, info } from "./ui.ts";
 
 export const CLI_VERSION = "0.1.0";
 
-const HELP = `${bold("crecia-db")} ${dim(CLI_VERSION)} — migraciones y schema, con psqldef y squawk adentro
+const HELP = `${bold("phoenix")} ${dim(CLI_VERSION)} — migraciones y schema, con psqldef y squawk adentro
 
 ${bold("USO")}
-  crecia-db <comando> [opciones]
+  phoenix <comando> [opciones]
 
 ${bold("COMANDOS")}
   status              qué está aplicado y qué no
@@ -27,7 +27,7 @@ ${bold("COMANDOS")}
   export              regenera el schema desde la base viva
   lint                pasa las migraciones por squawk
   baseline            genera el snapshot inicial (UNA sola vez por repo)
-  init                crea un crecia-db.config.ts en el directorio actual
+  init                crea un phoenix.config.ts en el directorio actual
   versions            qué versiones lleva este ejecutable adentro
 
 ${bold("OPCIONES DE migrate")}
@@ -40,13 +40,13 @@ ${bold("OPCIONES DE diff")}
   --check             sale 1 si hay cualquier diferencia (para CI)
 
 ${bold("GLOBALES")}
-  --config <path>     usa ese config en vez de buscar crecia-db.config.ts
+  --config <path>     usa ese config en vez de buscar phoenix.config.ts
   -h, --help          esta ayuda
   -v, --version       la versión del CLI
 
 ${bold("ENTORNO")}
   DATABASE_URL        obligatoria para todo lo que toca la base
-  CRECIA_DB_BIN_DIR   dónde buscar psqldef/squawk si el build no los trae
+  PHOENIX_BIN_DIR   dónde buscar psqldef/squawk si el build no los trae
 `;
 
 /** Comandos que no necesitan config ni base. */
@@ -108,7 +108,7 @@ export async function main(argv: string[]): Promise<number> {
       return baselineCommand(config, args);
     default:
       fail(`comando desconocido: ${command}`);
-      info(`  Probá: crecia-db --help`);
+      info(`  Probá: phoenix --help`);
       return 1;
   }
 }
@@ -118,7 +118,7 @@ export async function run(argv: string[] = Bun.argv.slice(2)): Promise<never> {
     process.exit(await main(argv));
   } catch (error) {
     fail(error instanceof Error ? error.message : String(error));
-    if (process.env.CRECIA_DB_DEBUG != null && error instanceof Error) {
+    if (process.env.PHOENIX_DEBUG != null && error instanceof Error) {
       process.stderr.write(`\n${error.stack ?? ""}\n`);
     }
     process.exit(1);

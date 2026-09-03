@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { fail, info, ok } from "../ui.ts";
 
-const TEMPLATE = `import { defineConfig } from "crecia-db";
+const TEMPLATE = `import { defineConfig } from "phoenix";
 
 export default defineConfig({
   migrationsDir: "database/migrations",
@@ -18,13 +18,13 @@ export default defineConfig({
 `;
 
 export async function initCommand(cwd: string): Promise<number> {
-  const path = join(cwd, "crecia-db.config.ts");
+  const path = join(cwd, "phoenix.config.ts");
   if (existsSync(path)) {
     fail(`ya existe ${path}`);
     return 1;
   }
   await Bun.write(path, TEMPLATE);
   ok(`creado ${path}`);
-  info("  Ajustá los paths y probá con: crecia-db status");
+  info("  Ajustá los paths y probá con: phoenix status");
   return 0;
 }

@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { isAbsolute, join, resolve } from "node:path";
 
 /**
- * Lo que cada repo consumidor declara en su `crecia-db.config.ts`. Todo tiene
+ * Lo que cada repo consumidor declara en su `phoenix.config.ts`. Todo tiene
  * default salvo los dos paths que de verdad dependen del repo.
  */
 export interface CreciaDbConfig {
@@ -46,7 +46,7 @@ export interface ResolvedConfig extends Required<Omit<CreciaDbConfig, "transform
   configPath: string;
 }
 
-const CONFIG_NAMES = ["crecia-db.config.ts", "crecia-db.config.js", "crecia-db.config.json"];
+const CONFIG_NAMES = ["phoenix.config.ts", "phoenix.config.js", "phoenix.config.json"];
 
 /** Busca el config hacia arriba desde `from`, como hacen git o tsconfig. */
 function findConfigFile(from: string): string | null {
@@ -68,8 +68,8 @@ export async function loadConfig(options: { cwd?: string; configPath?: string } 
 
   if (configPath == null) {
     throw new Error(
-      `No se encontró crecia-db.config.ts (ni .js/.json) desde ${cwd} hacia arriba.\n` +
-        `  Creá uno con: crecia-db init`,
+      `No se encontró phoenix.config.ts (ni .js/.json) desde ${cwd} hacia arriba.\n` +
+        `  Creá uno con: phoenix init`,
     );
   }
   if (!existsSync(configPath)) {
