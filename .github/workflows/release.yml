@@ -1,0 +1,102 @@
+name: Release
+
+# Dispara con un tag `v*` (v0.1.0, v0.2.0, ...) o a mano desde la pestaña
+# Actions. No hace falta ningún secreto propio: `secrets.GITHUB_TOKEN` lo
+# provee GitHub automáticamente con permiso de escribir un Release en ESTE
+# repo — por eso el job de release no necesita login de gh ni un PAT.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write # crear el Release y subirle los binarios
+
+jobs:
+  # linux-amd64: build nativo en el runner + smoke test real (lo ejecuta).
+  # Es la plataforma que de verdad se usa hoy (backend/central corren ahí).
+  build-linux-amd64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-go@v5
+        with: { go-version: "1.25" }
+      - run: bun install --frozen-lockfile
+      - run: bun run vendor linux-amd64
+      - run: bun run build linux-amd64
+      - name: Smoke test (ejecución real)
+        run: ./dist/phoenix-linux-amd64 versions
+      - uses: actions/upload-artifact@v4
+        with: { name: phoenix-linux-amd64, path: dist/phoenix-linux-amd64 }
+
+  # linux-arm64: cross-compilado desde un runner x86_64. Go y Bun cross-compilan
+  # sin problema, pero un binario arm64 no se puede EJECUTAR acá para probarlo
+  # de verdad — solo se valida que el archivo tenga la forma correcta (ELF
+  # arm64). La ejecución real queda pendiente de un runner arm64 nativo
+  # (ubuntu-24.04-arm existe como hosted runner, pero su disponibilidad
+  # depende del plan de la organización — no se asume acá).
+  build-linux-arm64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-go@v5
+        with: { go-version: "1.25" }
+      - run: bun install --frozen-lockfile
+      - run: bun run vendor linux-arm64
+      - run: bun run build linux-arm64
+      - name: Verificar que el binario es ELF arm64 (no se puede ejecutar acá)
+        run: file dist/phoenix-linux-arm64 | tee /dev/stderr | grep -q "ARM aarch64"
+      - uses: actions/upload-artifact@v4
+        with: { name: phoenix-linux-arm64, path: dist/phoenix-linux-arm64 }
+
+  # darwin-arm64: runner macOS nativo (Apple Silicon real, no emulado) — build
+  # Y smoke test genuinos. Es la verificación en Mac que faltaba y que nadie
+  # en el equipo tiene que hacer a mano.
+  build-darwin-arm64:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-go@v5
+        with: { go-version: "1.25" }
+      - run: bun install --frozen-lockfile
+      - run: bun run vendor darwin-arm64
+      - run: bun run build darwin-arm64
+      - name: Smoke test (ejecución real en Apple Silicon)
+        run: ./dist/phoenix-darwin-arm64 versions
+      - uses: actions/upload-artifact@v4
+        with: { name: phoenix-darwin-arm64, path: dist/phoenix-darwin-arm64 }
+
+  # darwin-amd64: mismo runner macOS, build cruzado a Intel (GOOS/GOARCH y
+  # --target=bun-darwin-x64 lo resuelven solos). La ejecución necesita
+  # Rosetta, que no viene preinstalada en el runner — se instala antes del
+  # smoke test en vez de omitirlo, porque acá si hay cómo probarlo de verdad.
+  build-darwin-amd64:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-go@v5
+        with: { go-version: "1.25" }
+      - run: bun install --frozen-lockfile
+      - run: bun run vendor darwin-amd64
+      - run: bun run build darwin-amd64
+      - name: Instalar Rosetta (para poder ejecutar el binario Intel acá)
+        run: softwareupdate --install-rosetta --agree-to-license
+      - name: Smoke test (bajo Rosetta)
+        run: ./dist/phoenix-darwin-amd64 versions
+      - uses: actions/upload-artifact@v4
+        with: { name: phoenix-darwin-amd64, path: dist/phoenix-darwin-amd64 }
+
+  release:
+    needs: [build-linux-amd64, build-linux-arm64, build-darwin-arm64, build-darwin-amd64]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: dist, merge-multiple: true }
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/phoenix-*
+          generate_release_notes: true

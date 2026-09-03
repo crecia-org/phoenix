@@ -18,13 +18,17 @@ Acá el fork viaja adentro del ejecutable. No hay comando obvio que lo rompa.
 
 ## Instalar
 
-Bajá el ejecutable de tu plataforma desde los releases y ponelo en el PATH:
+Bajá el ejecutable de tu plataforma desde los [releases](https://github.com/crecia-org/phoenix/releases)
+y ponelo en el PATH:
 
 ```bash
-curl -sSfL <url-del-release>/phoenix-linux-amd64 -o ~/.local/bin/phoenix
+curl -sSfL https://github.com/crecia-org/phoenix/releases/latest/download/phoenix-linux-amd64 -o ~/.local/bin/phoenix
 chmod +x ~/.local/bin/phoenix
 phoenix versions   # confirma qué lleva adentro
 ```
+
+Binarios disponibles: `phoenix-linux-amd64`, `phoenix-linux-arm64`,
+`phoenix-darwin-amd64`, `phoenix-darwin-arm64`.
 
 ## Usar
 
@@ -144,3 +148,21 @@ no empieza con `CREATE TRIGGER`, así que un clasificador que compare ese
 prefijo lo manda al grupo de las tablas, antes de la función que ejecuta. El
 archivo resultante falla al primer constraint trigger contra una base vacía —
 y solo se nota el día que alguien levanta una base desde cero.
+
+## Releases
+
+`.github/workflows/release.yml` corta un release al pushear un tag `v*` (o a
+mano desde la pestaña Actions). Compila las cuatro plataformas y sube los
+binarios — no hace falta ningún secreto propio, `GITHUB_TOKEN` (el que GitHub
+provee automáticamente para ese repo) alcanza para crear el Release.
+
+`linux-amd64` y `darwin-arm64` se prueban de verdad: el runner los EJECUTA
+(`phoenix versions`) antes de subirlos — Apple Silicon nativo para el segundo,
+sin emulación. `darwin-amd64` corre bajo Rosetta, instalada en el mismo paso.
+`linux-arm64` es cross-compilado y solo se valida que el binario tenga la
+forma correcta (ELF arm64): ejecutarlo de verdad necesita un runner arm64
+nativo, que no se asume disponible en la organización.
+
+`.github/workflows/ci.yml` corre en cada push/PR: typecheck + un build y smoke
+test de linux-amd64, para que un cambio que rompe el vendorizado se note antes
+de cortar una versión.

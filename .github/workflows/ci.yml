@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+
+  # Build + smoke test de linux-amd64 en cada push/PR, sin esperar a un tag —
+  # así un cambio que rompe el vendorizado o el build se ve antes del release,
+  # no cuando ya se está cortando una versión.
+  build-smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-go@v5
+        with: { go-version: "1.25" }
+      - run: bun install --frozen-lockfile
+      - run: bun run vendor linux-amd64
+      - run: bun run build linux-amd64
+      - run: ./dist/phoenix-linux-amd64 versions
